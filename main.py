@@ -29,8 +29,9 @@ class CrewResponse(BaseModel):
 
 def build_crew(topic: str) -> Crew:
     llm = LLM(
-        model="openrouter/google/gemini-2.0-flash-001",
-        api_key=os.getenv("OPENROUTER_API_KEY"),
+        model="ollama/gemma3",
+        base_url="https://ollama.com/api",
+        api_key=os.getenv("OLLAMA_API_KEY"),
     )
 
     researcher = Agent(
@@ -141,8 +142,8 @@ document.getElementById('topic').addEventListener('keydown',e=>{if(e.key==='Ente
 
 @app.post("/crew/run", response_model=CrewResponse)
 def run_crew(request: CrewRequest):
-    if not os.getenv("OPENROUTER_API_KEY"):
-        raise HTTPException(status_code=500, detail="OPENROUTER_API_KEY non configurée")
+    if not os.getenv("OLLAMA_API_KEY"):
+        raise HTTPException(status_code=500, detail="OLLAMA_API_KEY non configurée")
     try:
         crew = build_crew(request.topic)
         result = crew.kickoff()
