@@ -9,11 +9,6 @@ from crewai import LLM, Agent, Crew, Task, Process
 
 load_dotenv()
 
-llm = LLM(
-    model="openrouter/google/gemini-2.0-flash-001",
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-)
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -32,6 +27,11 @@ class CrewResponse(BaseModel):
 
 
 def build_crew(topic: str) -> Crew:
+    llm = LLM(
+        model="openrouter/google/gemini-2.0-flash-001",
+        api_key=os.getenv("OPENROUTER_API_KEY"),
+    )
+
     researcher = Agent(
         role="Chercheur Senior",
         goal=f"Trouver des informations clés sur : {topic}",
