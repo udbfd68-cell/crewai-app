@@ -5,9 +5,14 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from crewai import Agent, Crew, Task, Process
+from crewai import LLM, Agent, Crew, Task, Process
 
 load_dotenv()
+
+llm = LLM(
+    model="openrouter/google/gemini-2.0-flash-001",
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+)
 
 
 @asynccontextmanager
@@ -32,6 +37,7 @@ def build_crew(topic: str) -> Crew:
         goal=f"Trouver des informations clés sur : {topic}",
         backstory="Tu es un chercheur expérimenté avec un talent pour dénicher les informations les plus pertinentes.",
         verbose=False,
+        llm=llm,
     )
 
     writer = Agent(
@@ -39,6 +45,7 @@ def build_crew(topic: str) -> Crew:
         goal=f"Rédiger un résumé clair et concis sur : {topic}",
         backstory="Tu es un rédacteur talentueux qui transforme des recherches complexes en textes accessibles.",
         verbose=False,
+        llm=llm,
     )
 
     research_task = Task(
@@ -68,8 +75,8 @@ def health():
 
 @app.post("/crew/run", response_model=CrewResponse)
 def run_crew(request: CrewRequest):
-    if not os.getenv("OPENAI_API_KEY"):
-        raise HTTPException(status_code=500, detail="OPENAI_API_KEY non configurée")
+    if not os.getenv("OPENROUTER_API_KEY"):
+        raise HTTPException(status_code=500, detail="OPENROUTER_API_KEY non configurée")
     try:
         crew = build_crew(request.topic)
         result = crew.kickoff()
