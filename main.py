@@ -29,8 +29,8 @@ class CrewResponse(BaseModel):
 
 def build_crew(topic: str) -> Crew:
     llm = LLM(
-        model="ollama/gemma3",
-        base_url="https://ollama.com/api",
+        model="openai/gemma3",
+        base_url="https://ollama.com/v1",
         api_key=os.getenv("OLLAMA_API_KEY"),
     )
 
